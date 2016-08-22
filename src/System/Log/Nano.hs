@@ -38,9 +38,8 @@ logw = tell . (:[]) . TraceItem TWarning
 --
 -- Print messages to stdout
 --
-runLog :: (MonadWriter Trace m, HasTraceConfig r, MonadIO m, MonadReader r m) => WriterT Trace m a -> m (a, Trace)
-runLog act = do
-    level <- view traceLevel
+runLog :: (MonadWriter Trace m, MonadIO m) => WriterT Trace m a -> TraceLevel -> m (a, Trace)
+runLog act level = do
     (res, tx) <- runWriterT act
     mapM_ (liftIO . print) $ filter ((>=level) . _traceItemLevel) tx
     liftIO $ hFlush stdout 
